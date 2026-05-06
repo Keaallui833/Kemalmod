@@ -3,29 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEMAL MOD | APK</title>
+    <title>KEMAL MOD | Türkiye'nin APK Merkezi</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Önceki profesyonel tasarım kodlarını buraya ekleyebilirsin, ana yapı aynı */
-        body { background: #0b1121; color: white; font-family: sans-serif; margin: 0; }
-        #bakim-perdesi { display: none; position: fixed; inset: 0; background: #0b1121; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
-        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
-        .card { background: #151f32; padding: 20px; border-radius: 15px; border: 1px solid #2a3b5c; }
-        .btn { display: block; background: #00d2ff; color: white; text-align: center; padding: 10px; border-radius: 10px; text-decoration: none; margin-top: 10px; font-weight: bold; }
-        header { background: #151f32; padding: 20px; text-align: center; border-bottom: 2px solid #00d2ff; }
+        body { background: #0b1121; color: white; font-family: 'Poppins', sans-serif; margin: 0; }
+        #bakim-perdesi { display: none; position: fixed; inset: 0; background: #0b1121; z-index: 10000; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        header { background: #151f32; padding: 25px; text-align: center; border-bottom: 2px solid #3b82f6; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; padding: 40px 20px; }
+        .card { background: #151f32; border-radius: 20px; overflow: hidden; border: 1px solid #2a3b5c; transition: 0.3s; position: relative; }
+        .card:hover { transform: translateY(-10px); border-color: #3b82f6; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; }
+        .card-info { padding: 25px; }
+        .badge { background: #3b82f6; padding: 4px 12px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; }
+        .btn-dl { display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(45deg, #3b82f6, #2563eb); color: white; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <div id="bakim-perdesi">
-        <h1>SİTE BAKIMDADIR ⚙️</h1>
-        <p>Kemal abi sistemi güncelliyor...</p>
+        <i class="fas fa-tools" style="font-size: 4rem; color: #3b82f6; margin-bottom: 20px;"></i>
+        <h1>SİSTEM GÜNCELLENİYOR</h1>
+        <p>Kemal abi Toprak Koç'u geçmek için son ayarları yapıyor!</p>
     </div>
 
-    <div id="ana-site">
-        <header><h1>KEMAL MOD</h1></header>
+    <div id="main-site">
+        <header><h1 style="margin:0; letter-spacing:3px;">KEMAL MOD <i class="fas fa-bolt"></i></h1></header>
         <div class="container" id="grid"></div>
     </div>
 
@@ -34,30 +38,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ONLINE TAKİBİ (BU KISIM ÖNEMLİ)
-        const myStatusRef = db.ref('online').push();
-        myStatusRef.set(true);
-        myStatusRef.onDisconnect().remove();
+        // ONLINE TAKİBİ
+        const status = db.ref('online').push();
+        status.set(true);
+        status.onDisconnect().remove();
 
         // BAKIM KONTROLÜ
         db.ref('bakimModu').on('value', s => {
             document.getElementById('bakim-perdesi').style.display = s.val() ? "flex" : "none";
-            document.getElementById('ana-site').style.display = s.val() ? "none" : "block";
+            document.getElementById('main-site').style.display = s.val() ? "none" : "block";
         });
 
-        // OYUNLARI ÇEK
+        // MODLARI YÜKLE
         db.ref('mods').on('value', snap => {
             const grid = document.getElementById('grid');
             grid.innerHTML = "";
             snap.forEach(c => {
                 const g = c.val();
-                grid.innerHTML += `<div class="card">
-                    <img src="${g.img}" style="width:100%; border-radius:10px;">
-                    <h3>${g.name}</h3>
-                    <p style="color:#10b981">${g.mod}</p>
-                    <small>Sürüm: ${g.version}</small>
-                    <a href="${g.link}" class="btn">HİLEYİ İNDİR</a>
-                </div>`;
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${g.img}" class="card-img">
+                        <div class="card-info">
+                            <span class="badge">${g.category}</span>
+                            <h2 style="margin:15px 0 10px 0;">${g.name}</h2>
+                            <p style="color:#94a3b8; font-size:0.9rem;">Sürüm: ${g.version}</p>
+                            <p style="color:#10b981; font-weight:bold;">${g.mod}</p>
+                            <a href="${g.link}" target="_blank" class="btn-dl"><i class="fas fa-download"></i> GÜVENLİ İNDİR</a>
+                        </div>
+                    </div>`;
             });
         });
     </script>
