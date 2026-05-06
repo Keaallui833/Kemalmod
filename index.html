@@ -3,75 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEMAL MOD | APK MERKEZİ</title>
+    <title>KEMAL MOD | Profesyonel APK Merkezi</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { background: #070d19; color: white; font-family: sans-serif; margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        :root { --primary: #0066ff; --gold: #d4af37; --bg: #050a14; --card-bg: #101827; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* BAKIM PERDESİ */
+        /* BAKIM EKRANI */
         #bakim-perdesi {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #070d19; z-index: 999999; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100000;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
         }
+        .bakim-kutu { border: 2px solid var(--gold); padding: 50px; border-radius: 30px; background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); }
 
-        /* ANA SİTE STİLLERİ */
-        header { background: #121c2d; padding: 30px; text-align: center; border-bottom: 2px solid #0066ff; }
-        .search-area { padding: 20px; text-align: center; background: #0a1425; }
-        #searchInput { width: 85%; max-width: 500px; padding: 12px; border-radius: 25px; border: 1px solid #0066ff; background: #121c2d; color: white; outline: none; }
+        /* HEADER */
+        header { 
+            background: rgba(16, 24, 39, 0.8); backdrop-filter: blur(15px);
+            padding: 20px; text-align: center; border-bottom: 2px solid var(--primary);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 2.2rem; font-weight: 900; letter-spacing: 5px; color: #fff; text-shadow: 0 0 15px var(--primary); margin: 0; }
         
-        .categories { margin-top: 15px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-        .cat-btn { background: #1e2a42; color: white; border: 1px solid #333; padding: 8px 15px; border-radius: 15px; cursor: pointer; }
-        .cat-btn.active { background: #0066ff; }
+        /* ARAMA VE FİLTRE */
+        .hero { padding: 40px 20px; text-align: center; background: radial-gradient(circle at top, #001a3d, var(--bg)); }
+        #searchInput { 
+            width: 90%; max-width: 600px; padding: 15px 25px; border-radius: 50px; 
+            border: 1px solid #333; background: #1a2436; color: white; font-size: 1.1rem;
+            transition: 0.3s; box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        #searchInput:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
 
-        .container { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 20px; }
-        .game-card { background: #121c2d; width: 300px; border-radius: 15px; overflow: hidden; border: 1px solid #1e2a42; position: relative; }
-        .game-img { width: 100%; height: 160px; object-fit: cover; }
-        .game-info { padding: 15px; }
-        .game-name { font-size: 1.2rem; font-weight: bold; display: block; margin-bottom: 10px; }
-        .game-mod { color: #27ae60; font-size: 0.9rem; margin-bottom: 15px; min-height: 40px; }
-        .download-btn { display: block; background: #d4af37; color: #000; text-align: center; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; }
-        .category-tag { position: absolute; top: 10px; left: 10px; background: rgba(0, 102, 255, 0.8); padding: 3px 10px; border-radius: 10px; font-size: 0.7rem; }
+        .categories { margin-top: 25px; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+        .cat-btn { 
+            background: #1a2436; border: 1px solid #333; color: #ccc; padding: 10px 20px; 
+            border-radius: 30px; cursor: pointer; transition: 0.3s; font-weight: 600;
+        }
+        .cat-btn:hover, .cat-btn.active { background: var(--primary); color: white; border-color: white; transform: translateY(-3px); }
 
-        /* VIP FOOTER / INSTAGRAM */
-        .gold-footer { margin-top: auto; padding: 40px 20px; text-align: center; background: #0a1425; border-top: 1px solid #d4af37; }
-        .gold-link { display: inline-block; text-decoration: none; padding: 20px 40px; border: 2px solid #d4af37; border-radius: 20px; background: #121c2d; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+        /* OYUN KARTLARI */
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; padding: 40px; max-width: 1400px; margin: auto; }
+        .game-card { 
+            background: var(--card-bg); border-radius: 20px; overflow: hidden; 
+            border: 1px solid #1f2937; transition: 0.4s; position: relative;
+        }
+        .game-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 15px 30px rgba(0,0,0,0.6); }
+        .game-img-wrap { position: relative; width: 100%; height: 180px; overflow: hidden; }
+        .game-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .game-card:hover .game-img { scale: 1.1; filter: brightness(0.7); }
+        
+        .badge { position: absolute; top: 15px; left: 15px; background: var(--primary); padding: 5px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
+        
+        .game-info { padding: 20px; }
+        .game-name { font-size: 1.3rem; font-weight: bold; color: white; display: block; margin-bottom: 5px; }
+        .game-mod-desc { color: #10b981; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px; height: 40px; overflow: hidden; }
+        
+        .download-btn { 
+            display: block; background: linear-gradient(45deg, var(--gold), #f39c12); 
+            color: black; text-align: center; padding: 12px; text-decoration: none; 
+            border-radius: 12px; font-weight: 900; letter-spacing: 1px; transition: 0.3s;
+        }
+        .download-btn:hover { filter: brightness(1.2); letter-spacing: 2px; }
+
+        /* FOOTER */
+        footer { background: #0a101d; padding: 60px 20px; text-align: center; border-top: 1px solid #1f2937; }
+        .insta-card { 
+            display: inline-block; padding: 25px 50px; border: 2px solid var(--gold); 
+            border-radius: 25px; background: rgba(212, 175, 55, 0.05); text-decoration: none; 
+            transition: 0.4s;
+        }
+        .insta-card:hover { background: var(--gold); }
+        .insta-card:hover * { color: black !important; }
     </style>
 </head>
 <body>
 
     <div id="bakim-perdesi">
-        <h1 style="color: #ff3b3b; font-size: 3rem;">SİTE BAKIMDADIR</h1>
-        <p style="font-size: 1.2rem;">Kemal abi şu an güncellemeleri yapıyor...</p>
-        <div style="font-size: 4rem; margin: 20px;">⚙️</div>
-        <p style="color: #555;">Lütfen daha sonra tekrar deneyiniz.</p>
+        <div class="bakim-kutu">
+            <h1 style="color:var(--gold); font-size: 3rem; margin:0;">KEMAL MOD</h1>
+            <h2 style="margin: 20px 0;">SİSTEM GÜNCELENİYOR</h2>
+            <p style="color:#888;">Toprak Koç'u geçmeye çok az kaldı. Kemal abi şu an sistemi güçlendiriyor!</p>
+            <div style="font-size: 4rem; margin: 30px;">⚡</div>
+            <p style="color:var(--gold); font-weight: bold;">Instagram: @Ke4m2l</p>
+        </div>
     </div>
 
-    <div id="ana-icerik">
+    <div id="ana-site">
         <header>
-            <h1 style="font-size: 2.5rem; letter-spacing: 3px;">KEMAL MOD</h1>
+            <h1 class="logo">KEMAL MOD</h1>
         </header>
 
-        <div class="search-area">
-            <input type="text" id="searchInput" placeholder="Oyun ara Kemal abi..." onkeyup="ara()">
+        <section class="hero">
+            <input type="text" id="searchInput" placeholder="Oyunlarda hile ara Kemal abi..." onkeyup="ara()">
             <div class="categories">
-                <button class="cat-btn active" onclick="filtrele('Hepsi', this)">Hepsi</button>
+                <button class="cat-btn active" onclick="filtrele('Hepsi', this)">Tüm Oyunlar</button>
                 <button class="cat-btn" onclick="filtrele('Spor', this)">Spor</button>
                 <button class="cat-btn" onclick="filtrele('Aksiyon', this)">Aksiyon</button>
                 <button class="cat-btn" onclick="filtrele('Yarış', this)">Yarış</button>
                 <button class="cat-btn" onclick="filtrele('Simülasyon', this)">Simülasyon</button>
             </div>
-        </div>
+        </section>
 
-        <div class="container" id="gameContainer"></div>
+        <div class="container" id="gameContainer">
+            </div>
 
-        <footer class="gold-footer">
-            <a href="https://www.instagram.com/Ke4m2l" target="_blank" class="gold-link">
-                <div style="color:#d4af37; font-size:0.7rem; text-transform:uppercase; letter-spacing:3px; margin-bottom:5px;">YAPIMCI INSTAGRAM</div>
-                <div style="color:white; font-size:1.6rem; font-weight:bold;">@Ke4m2l</div>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" style="width:30px; margin-top:10px;" alt="Insta">
+        <footer>
+            <a href="https://www.instagram.com/Ke4m2l" target="_blank" class="insta-card">
+                <div style="color:var(--gold); font-size:0.8rem; letter-spacing:4px; margin-bottom:10px;">YAPIMCI</div>
+                <div style="color:white; font-size:2rem; font-weight:900;">@Ke4m2l</div>
+                <div style="margin-top:15px; color:#555;">Tıkla ve Takip Et</div>
             </a>
-            <p style="margin-top:20px; color:#444; font-size:0.8rem;">Tüm Modlar Kemal Mod Güvencesiyle</p>
+            <p style="margin-top:40px; color:#333;">© 2026 Kemal Mod | Android Oyun Club'a Tek Rakip</p>
         </footer>
     </div>
 
@@ -80,14 +122,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Bakım Modu Dinleyicisi
+        // BAKIM KONTROLÜ
         db.ref('bakimModu').on('value', s => {
             const bakimda = s.val();
             document.getElementById('bakim-perdesi').style.display = bakimda ? "flex" : "none";
-            document.getElementById('ana-icerik').style.display = bakimda ? "none" : "block";
+            document.getElementById('ana-site').style.display = bakimda ? "none" : "block";
         });
 
-        // Veri Çekme
+        // VERİLERİ ÇEK
         db.ref('mods').on('value', (snap) => {
             const container = document.getElementById('gameContainer');
             container.innerHTML = "";
@@ -95,12 +137,14 @@
                 const g = child.val();
                 container.innerHTML += `
                     <div class="game-card" data-category="${g.category || 'Diğer'}">
-                        <div class="category-tag">${g.category || 'Diğer'}</div>
-                        <img src="${g.img || 'https://via.placeholder.com/300x160/070d19/d4af37?text=KEMAL+MOD'}" class="game-img">
+                        <div class="game-img-wrap">
+                            <div class="badge">${g.category || 'APK'}</div>
+                            <img src="${g.img || 'https://via.placeholder.com/300x180'}" class="game-img">
+                        </div>
                         <div class="game-info">
                             <span class="game-name">${g.name}</span>
-                            <div class="game-mod">${g.mod}</div>
-                            <a href="${g.link}" target="_blank" class="download-btn">İNDİR</a>
+                            <div class="game-mod-desc">${g.mod}</div>
+                            <a href="${g.link}" target="_blank" class="download-btn">HİLEYİ İNDİR</a>
                         </div>
                     </div>`;
             });
@@ -108,20 +152,20 @@
 
         function ara() {
             let val = document.getElementById('searchInput').value.toLowerCase();
-            let cards = document.getElementsByClassName('game-card');
-            for(let c of cards) {
-                let n = c.querySelector('.game-name').innerText.toLowerCase();
-                c.style.display = n.includes(val) ? "block" : "none";
-            }
+            let cards = document.querySelectorAll('.game-card');
+            cards.forEach(c => {
+                let name = c.querySelector('.game-name').innerText.toLowerCase();
+                c.style.display = name.includes(val) ? "block" : "none";
+            });
         }
 
         function filtrele(cat, btn) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            let cards = document.getElementsByClassName('game-card');
-            for(let c of cards) {
-                c.style.display = (cat==='Hepsi' || c.getAttribute('data-category')===cat) ? "block" : "none";
-            }
+            let cards = document.querySelectorAll('.game-card');
+            cards.forEach(c => {
+                c.style.display = (cat === 'Hepsi' || c.getAttribute('data-category') === cat) ? "block" : "none";
+            });
         }
     </script>
 </body>
