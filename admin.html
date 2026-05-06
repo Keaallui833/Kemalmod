@@ -2,92 +2,209 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KEMAL MOD | Admin Kontrol Merkezi</title>
+    <title>KEMAL MOD | MASTER CONTROL PANEL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #050a14; color: white; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .panel { background: #101827; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; border: 1px solid var(--primary); margin-bottom: 30px; border: 1px solid #1e2937; }
-        h2, h3 { text-align: center; color: #0066ff; }
-        input, select, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: none; font-size: 1rem; }
-        input, select { background: #1a2436; color: white; border: 1px solid #333; }
-        button { background: #0066ff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { filter: brightness(1.2); }
-        .bakim-panel { border-color: #ff3b3b; }
-        .game-item { background: #1a2436; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .del-btn { background: #ff3b3b; width: auto; padding: 8px 15px; }
+        :root { --sidebar: #1e293b; --bg: #0f172a; --accent: #3b82f6; --text: #f8fafc; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--sidebar); display: flex; flex-direction: column; padding: 20px; border-right: 1px solid #334155; }
+        .sidebar h2 { font-size: 1.2rem; color: var(--accent); margin-bottom: 30px; text-align: center; border-bottom: 1px solid #334155; padding-bottom: 15px; }
+        .nav-link { padding: 15px; color: #94a3b8; text-decoration: none; border-radius: 10px; cursor: pointer; margin-bottom: 5px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .nav-link:hover, .nav-link.active { background: var(--accent); color: white; }
+
+        /* MAIN CONTENT */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        
+        .stat-card { background: #1e293b; padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); margin-bottom: 20px; display: inline-block; min-width: 200px; margin-right: 20px; }
+        .stat-num { font-size: 2rem; font-weight: bold; display: block; }
+        
+        .box { background: #1e293b; padding: 25px; border-radius: 15px; margin-top: 20px; border: 1px solid #334155; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        button { background: var(--accent); cursor: pointer; font-weight: bold; border: none; }
+        
+        .log-item { font-size: 0.85rem; padding: 10px; border-bottom: 1px solid #334155; color: #94a3b8; }
+        .game-item { display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="panel bakim-panel">
-        <h3>🚨 SİSTEM ŞALTERİ</h3>
-        <div id="bakim-durum" style="text-align:center; font-weight:bold; margin-bottom:15px;">YÜKLENİYOR...</div>
-        <button id="bakim-btn" onclick="bakimDegistir()">DURUM DEĞİŞTİR</button>
+    <div class="sidebar">
+        <h2>KEMAL MOD V5</h2>
+        <div class="nav-link active" onclick="showTab('stats', this)"><i class="fas fa-chart-line"></i> İstatistikler</div>
+        <div class="nav-link" onclick="showTab('manage', this)"><i class="fas fa-plus-circle"></i> Oyun Ekle/Güncelle</div>
+        <div class="nav-link" onclick="showTab('list', this)"><i class="fas fa-tasks"></i> Mevcut Oyunlar</div>
+        <div class="nav-link" onclick="showTab('logs', this)"><i class="fas fa-history"></i> İşlem Logları</div>
+        <div class="nav-link" onclick="showTab('settings', this)"><i class="fas fa-cog"></i> Sistem Ayarları</div>
     </div>
 
-    <div class="panel">
-        <h2>Oyun Ekle / Güncelle</h2>
-        <input type="text" id="n" placeholder="Oyun Adı (Örn: PUBG Mobile)">
-        <input type="text" id="m" placeholder="Hile Özelliği (Örn: Sekmeme + Hız)">
-        <input type="text" id="l" placeholder="İndirme Linki (Drive/Mega)">
-        <input type="text" id="i" placeholder="Kapak Resmi Linki">
-        <select id="cat">
-            <option value="Spor">Spor</option>
-            <option value="Aksiyon">Aksiyon</option>
-            <option value="Yarış">Yarış</option>
-            <option value="Simülasyon">Simülasyon</option>
-            <option value="Diğer">Diğer</option>
-        </select>
-        <button onclick="kaydet()">SİTEYE GÖNDER 🚀</button>
-    </div>
+    <div class="content">
+        <div id="stats" class="tab-content active">
+            <h1>Panel Özeti</h1>
+            <div class="stat-card">
+                <span class="stat-num" id="online-count">0</span>
+                <span>Anlık Ziyaretçi</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-num" id="total-games">0</span>
+                <span>Toplam Oyun/Mod</span>
+            </div>
+            <div class="box">
+                <h3>Ziyaretçi Detayları</h3>
+                <p id="visitor-ip" style="color:#94a3b8;">Son giriş yapan IP adresleri burada görünecek...</p>
+            </div>
+        </div>
 
-    <div class="panel">
-        <h3>Yüklenen Modlar</h3>
-        <div id="game-list"></div>
+        <div id="manage" class="tab-content">
+            <h1 id="form-title">Yeni Mod Ekle</h1>
+            <div class="box">
+                <input type="text" id="n" placeholder="Oyun Adı">
+                <input type="text" id="v" placeholder="Sürüm (v3.0 vb.)">
+                <input type="text" id="m" placeholder="Hile Özelliği">
+                <select id="cat">
+                    <option value="Aksiyon">Aksiyon</option>
+                    <option value="Spor">Spor</option>
+                    <option value="Yarış">Yarış</option>
+                    <option value="Simülasyon">Simülasyon</option>
+                </select>
+                <input type="text" id="l" placeholder="İndirme Linki">
+                <input type="text" id="i" placeholder="Kapak Resmi Linki">
+                <button id="save-btn" onclick="saveData()">SİSTEME KAYDET</button>
+                <button id="cancel-btn" onclick="resetForm()" style="display:none; background:#555;">İPTAL</button>
+            </div>
+        </div>
+
+        <div id="list" class="tab-content">
+            <h1>Oyun Yönetimi</h1>
+            <div id="game-list-content"></div>
+        </div>
+
+        <div id="logs" class="tab-content">
+            <h1>İşlem Logları</h1>
+            <div class="box" id="log-content"></div>
+        </div>
+
+        <div id="settings" class="tab-content">
+            <h1>Sistem Ayarları</h1>
+            <div class="box">
+                <h3>Bakim Modu Şalteri</h3>
+                <p id="bakim-durum">Durum: Yükleniyor...</p>
+                <button onclick="toggleBakim()" id="bakim-sh-btn">DEĞİŞTİR</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyCYS1dMW6uGt8cwJVs6cspNBuX0TTOGS_c", databaseURL: "https://kemalmod-resmi-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        let editId = null;
+
+        function showTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+        }
+
+        // İstatistikler & Online Sayısı
+        db.ref('online').on('value', s => {
+            document.getElementById('online-count').innerText = s.numChildren();
+        });
 
         // Bakım Modu
         db.ref('bakimModu').on('value', s => {
-            const aktif = s.val();
-            const d = document.getElementById('bakim-durum');
-            const b = document.getElementById('bakim-btn');
-            d.innerText = aktif ? "SİTE KAPALI ⛔" : "SİTE HERKESE AÇIK ✅";
-            d.style.color = aktif ? "#ff3b3b" : "#27ae60";
-            b.innerText = aktif ? "SİTEYİ AÇ" : "SİTEYİ BAKIMA AL";
-            b.style.background = aktif ? "#27ae60" : "#ff3b3b";
+            const b = s.val();
+            document.getElementById('bakim-durum').innerText = b ? "DURUM: ŞU AN BAKIMDA" : "DURUM: SİTE AKTİF";
+            document.getElementById('bakim-sh-btn').innerText = b ? "SİTEYİ AÇ" : "BAKIMA AL";
         });
 
-        function bakimDegistir() {
-            db.ref('bakimModu').once('value').then(s => db.ref('bakimModu').set(!s.val()));
+        function toggleBakim() {
+            db.ref('bakimModu').once('value').then(s => {
+                db.ref('bakimModu').set(!s.val());
+                addLog("Bakım modu durumu değiştirildi.");
+            });
         }
 
-        function kaydet() {
+        function saveData() {
             const data = {
                 name: document.getElementById('n').value,
+                version: document.getElementById('v').value,
                 mod: document.getElementById('m').value,
+                category: document.getElementById('cat').value,
                 link: document.getElementById('l').value,
                 img: document.getElementById('i').value,
-                category: document.getElementById('cat').value
+                timestamp: Date.now()
             };
-            db.ref('mods').push(data).then(() => { alert("Başarıyla Fırlatıldı!"); location.reload(); });
+            if(editId) {
+                db.ref('mods').child(editId).update(data).then(() => {
+                    addLog(data.name + " güncellendi.");
+                    resetForm();
+                    alert("Güncellendi!");
+                });
+            } else {
+                db.ref('mods').push(data).then(() => {
+                    addLog(data.name + " eklendi.");
+                    resetForm();
+                    alert("Eklendi!");
+                });
+            }
         }
 
-        db.ref('mods').on('value', (snap) => {
-            const list = document.getElementById('game-list');
+        function editMode(id, n, v, m, c, l, i) {
+            editId = id;
+            document.getElementById('n').value = n;
+            document.getElementById('v').value = v;
+            document.getElementById('m').value = m;
+            document.getElementById('cat').value = c;
+            document.getElementById('l').value = l;
+            document.getElementById('i').value = i;
+            document.getElementById('form-title').innerText = "Oyunu Düzenle";
+            document.getElementById('cancel-btn').style.display = "block";
+            showTab('manage', document.querySelector('.nav-link:nth-child(2)'));
+        }
+
+        function resetForm() {
+            editId = null;
+            document.querySelectorAll('input').forEach(i => i.value = "");
+            document.getElementById('form-title').innerText = "Yeni Mod Ekle";
+            document.getElementById('cancel-btn').style.display = "none";
+        }
+
+        function addLog(msg) {
+            db.ref('logs').push({ msg: msg, time: new Date().toLocaleString() });
+        }
+
+        // Oyun Listesi ve Toplam Sayı
+        db.ref('mods').on('value', snap => {
+            const list = document.getElementById('game-list-content');
+            document.getElementById('total-games').innerText = snap.numChildren();
             list.innerHTML = "";
-            snap.forEach((child) => {
-                const g = child.val();
-                list.innerHTML += `
-                    <div class="game-item">
-                        <span>${g.name}</span>
-                        <button class="del-btn" onclick="db.ref('mods').child('${child.key}').remove()">SİL</button>
-                    </div>`;
+            snap.forEach(c => {
+                const g = c.val();
+                list.innerHTML += `<div class="game-item">
+                    <span><b>${g.name}</b> (${g.version})</span>
+                    <div>
+                        <button onclick="editMode('${c.key}','${g.name}','${g.version}','${g.mod}','${g.category}','${g.link}','${g.img}')" style="width:auto; padding:5px 15px; background:orange;">DÜZENLE</button>
+                        <button onclick="db.ref('mods').child('${c.key}').remove()" style="width:auto; padding:5px 15px; background:red;">SİL</button>
+                    </div>
+                </div>`;
+            });
+        });
+
+        // Logları Çek
+        db.ref('logs').limitToLast(10).on('value', snap => {
+            const lc = document.getElementById('log-content');
+            lc.innerHTML = "";
+            snap.forEach(c => {
+                lc.innerHTML = `<div class="log-item">[${c.val().time}] ${c.val().msg}</div>` + lc.innerHTML;
             });
         });
     </script>
