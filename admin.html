@@ -2,25 +2,48 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KEMAL MOD | PANEL</title>
+    <title>KEMAL MOD | GELİŞMİŞ PANEL</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { background: #070d19; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .panel { background: #121c2d; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; border: 1px solid #0066ff; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; }
-        input { background: #1e2a42; color: white; }
-        button { background: #0066ff; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        body { background: #070d19; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .panel { background: #121c2d; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #0066ff; margin-bottom: 30px; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; box-sizing: border-box; }
+        input, select { background: #1e2a42; color: white; border: 1px solid #333; }
+        button { background: #0066ff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0044bb; }
+        .delete-btn { background: #ff3b3b; width: auto; padding: 5px 15px; margin: 0; }
+        
+        .list-container { width: 100%; max-width: 450px; background: #121c2d; border-radius: 15px; padding: 20px; border: 1px solid #333; }
+        .game-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #1e2a42; }
+        .game-item:last-child { border-bottom: none; }
+        h2, h3 { text-align: center; color: #0066ff; }
     </style>
 </head>
 <body>
+
     <div class="panel">
         <h2>Oyun Ekle Kemal Abi</h2>
         <input type="text" id="n" placeholder="Oyun Adı">
         <input type="text" id="m" placeholder="Mod Özelliği (Hile)">
         <input type="text" id="l" placeholder="Mediafire İndirme Linki">
         <input type="text" id="i" placeholder="Resim Linki (Boş kalabilir)">
+        
+        <select id="cat">
+            <option value="Diğer">Kategori Seç Abi</option>
+            <option value="Spor">Spor</option>
+            <option value="Aksiyon">Aksiyon</option>
+            <option value="Yarış">Yarış</option>
+            <option value="Simülasyon">Simülasyon</option>
+        </select>
+
         <button onclick="add()">SİTEYE FIRLAT!</button>
+    </div>
+
+    <div class="list-container">
+        <h3>Aktif Oyunlar / Silme</h3>
+        <div id="game-list">
+            </div>
     </div>
 
     <script>
@@ -31,18 +54,52 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // OYUN EKLEME
         function add() {
             const name = document.getElementById('n').value;
             const mod = document.getElementById('m').value;
             const link = document.getElementById('l').value;
             const img = document.getElementById('i').value;
+            const category = document.getElementById('cat').value;
 
-            if(!name || !link) return alert("Ad ve Link lazım!");
+            if(!name || !link) return alert("Kemal abi, Ad ve Link lazım!");
 
-            db.ref('mods').push({ name, mod, link, img }).then(() => {
-                alert("Oyun Eklendi!");
+            db.ref('mods').push({ 
+                name: name, 
+                mod: mod, 
+                link: link, 
+                img: img,
+                category: category 
+            }).then(() => {
+                alert("Oyun Başarıyla Fırlatıldı!");
                 document.querySelectorAll('input').forEach(i => i.value = "");
             });
+        }
+
+        // OYUNLARI LİSTELEME VE SİLME
+        db.ref('mods').on('value', (snapshot) => {
+            const listDiv = document.getElementById('game-list');
+            listDiv.innerHTML = "";
+            
+            snapshot.forEach((child) => {
+                const game = child.val();
+                const gameId = child.key;
+
+                listDiv.innerHTML += `
+                    <div class="game-item">
+                        <span>${game.name} <small style="color:#888">(${game.category})</small></span>
+                        <button class="delete-btn" onclick="removeGame('${gameId}')">SİL</button>
+                    </div>
+                `;
+            });
+        });
+
+        function removeGame(id) {
+            if(confirm("Bu oyunu silmek istediğine emin misin Kemal abi?")) {
+                db.ref('mods').child(id).remove().then(() => {
+                    alert("Oyun silindi!");
+                });
+            }
         }
     </script>
 </body>
