@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>KEMAL MOD | PANEL</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { background: #070d19; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .panel { background: #121c2d; padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; border: 1px solid #0066ff; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; }
+        input { background: #1e2a42; color: white; }
+        button { background: #0066ff; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h2>Oyun Ekle Kemal Abi</h2>
+        <input type="text" id="n" placeholder="Oyun Adı">
+        <input type="text" id="m" placeholder="Mod Özelliği (Hile)">
+        <input type="text" id="l" placeholder="Mediafire İndirme Linki">
+        <input type="text" id="i" placeholder="Resim Linki (Boş kalabilir)">
+        <button onclick="add()">SİTEYE FIRLAT!</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYS1dMW6uGt8cwJVs6cspNBuX0TTOGS_c",
+            databaseURL: "https://kemalmod-resmi-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function add() {
+            const name = document.getElementById('n').value;
+            const mod = document.getElementById('m').value;
+            const link = document.getElementById('l').value;
+            const img = document.getElementById('i').value;
+
+            if(!name || !link) return alert("Ad ve Link lazım!");
+
+            db.ref('mods').push({ name, mod, link, img }).then(() => {
+                alert("Oyun Eklendi!");
+                document.querySelectorAll('input').forEach(i => i.value = "");
+            });
+        }
+    </script>
+</body>
+</html>
