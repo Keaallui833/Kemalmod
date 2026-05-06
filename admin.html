@@ -2,36 +2,36 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KEMAL MOD | ADMIN PANEL V4</title>
+    <title>KEMAL MOD | Admin Kontrol Merkezi</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        body { background: #070d19; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .panel { background: #121c2d; padding: 20px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #0066ff; margin-bottom: 20px; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; box-sizing: border-box; }
-        input, select { background: #1e2a42; color: white; border: 1px solid #333; }
+        body { background: #050a14; color: white; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .panel { background: #101827; padding: 30px; border-radius: 20px; width: 100%; max-width: 500px; border: 1px solid var(--primary); margin-bottom: 30px; border: 1px solid #1e2937; }
+        h2, h3 { text-align: center; color: #0066ff; }
+        input, select, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: none; font-size: 1rem; }
+        input, select { background: #1a2436; color: white; border: 1px solid #333; }
         button { background: #0066ff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .list-container { width: 100%; max-width: 450px; background: #121c2d; border-radius: 15px; padding: 20px; border: 1px solid #333; }
-        .game-item { display: flex; flex-direction: column; padding: 15px; border-bottom: 1px solid #1e2a42; gap: 10px; }
-        .item-actions { display: flex; gap: 10px; }
-        .delete-btn { background: #ff3b3b; flex: 1; }
-        .edit-btn { background: #f39c12; flex: 1; }
+        button:hover { filter: brightness(1.2); }
+        .bakim-panel { border-color: #ff3b3b; }
+        .game-item { background: #1a2436; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { background: #ff3b3b; width: auto; padding: 8px 15px; }
     </style>
 </head>
 <body>
 
-    <div class="panel" style="border-color: #ff3b3b; text-align: center;">
-        <h3>SİTE ERİŞİM ŞALTERİ</h3>
-        <div id="bakim-durum" style="font-weight: bold; margin-bottom: 10px;">Yükleniyor...</div>
-        <button id="bakim-btn" onclick="bakimDegistir()">DURUMU DEĞİŞTİR</button>
+    <div class="panel bakim-panel">
+        <h3>🚨 SİSTEM ŞALTERİ</h3>
+        <div id="bakim-durum" style="text-align:center; font-weight:bold; margin-bottom:15px;">YÜKLENİYOR...</div>
+        <button id="bakim-btn" onclick="bakimDegistir()">DURUM DEĞİŞTİR</button>
     </div>
 
     <div class="panel">
-        <h2 id="panel-title">Oyun Yönetimi</h2>
-        <input type="text" id="n" placeholder="Oyun Adı">
-        <input type="text" id="m" placeholder="Mod Özelliği">
-        <input type="text" id="l" placeholder="İndirme Linki">
-        <input type="text" id="i" placeholder="Resim Linki">
+        <h2>Oyun Ekle / Güncelle</h2>
+        <input type="text" id="n" placeholder="Oyun Adı (Örn: PUBG Mobile)">
+        <input type="text" id="m" placeholder="Hile Özelliği (Örn: Sekmeme + Hız)">
+        <input type="text" id="l" placeholder="İndirme Linki (Drive/Mega)">
+        <input type="text" id="i" placeholder="Kapak Resmi Linki">
         <select id="cat">
             <option value="Spor">Spor</option>
             <option value="Aksiyon">Aksiyon</option>
@@ -39,12 +39,11 @@
             <option value="Simülasyon">Simülasyon</option>
             <option value="Diğer">Diğer</option>
         </select>
-        <button id="main-btn" onclick="handleAction()">SİTEYE FIRLAT!</button>
-        <button id="cancel-btn" onclick="resetForm()" style="display:none; background:#555;">İPTAL</button>
+        <button onclick="kaydet()">SİTEYE GÖNDER 🚀</button>
     </div>
 
-    <div class="list-container">
-        <h3>Aktif Oyunlar / Yönetim</h3>
+    <div class="panel">
+        <h3>Yüklenen Modlar</h3>
         <div id="game-list"></div>
     </div>
 
@@ -52,16 +51,15 @@
         const firebaseConfig = { apiKey: "AIzaSyCYS1dMW6uGt8cwJVs6cspNBuX0TTOGS_c", databaseURL: "https://kemalmod-resmi-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let editingId = null;
 
-        // Bakım Modu Mantığı
-        db.ref('bakimModu').on('value', (s) => {
+        // Bakım Modu
+        db.ref('bakimModu').on('value', s => {
             const aktif = s.val();
             const d = document.getElementById('bakim-durum');
             const b = document.getElementById('bakim-btn');
-            d.innerText = aktif ? "DURUM: SİTE KAPALI (BAKIMDA)" : "DURUM: SİTE AÇIK";
+            d.innerText = aktif ? "SİTE KAPALI ⛔" : "SİTE HERKESE AÇIK ✅";
             d.style.color = aktif ? "#ff3b3b" : "#27ae60";
-            b.innerText = aktif ? "SİTEYİ YAYINA AL" : "SİTEYİ BAKIMA AL";
+            b.innerText = aktif ? "SİTEYİ AÇ" : "SİTEYİ BAKIMA AL";
             b.style.background = aktif ? "#27ae60" : "#ff3b3b";
         });
 
@@ -69,8 +67,7 @@
             db.ref('bakimModu').once('value').then(s => db.ref('bakimModu').set(!s.val()));
         }
 
-        // Oyun İşlemleri
-        function handleAction() {
+        function kaydet() {
             const data = {
                 name: document.getElementById('n').value,
                 mod: document.getElementById('m').value,
@@ -78,43 +75,18 @@
                 img: document.getElementById('i').value,
                 category: document.getElementById('cat').value
             };
-            if(editingId) {
-                db.ref('mods').child(editingId).update(data).then(() => { alert("Güncellendi!"); resetForm(); });
-            } else {
-                db.ref('mods').push(data).then(() => { alert("Eklendi!"); resetForm(); });
-            }
-        }
-
-        function editGame(id, n, m, l, i, c) {
-            editingId = id;
-            document.getElementById('n').value = n; document.getElementById('m').value = m;
-            document.getElementById('l').value = l; document.getElementById('i').value = i;
-            document.getElementById('cat').value = c;
-            document.getElementById('panel-title').innerText = "Oyunu Düzenle";
-            document.getElementById('main-btn').innerText = "GÜNCELLE";
-            document.getElementById('cancel-btn').style.display = "block";
-        }
-
-        function resetForm() {
-            editingId = null;
-            document.querySelectorAll('input').forEach(i => i.value = "");
-            document.getElementById('panel-title').innerText = "Oyun Ekle Kemal Abi";
-            document.getElementById('main-btn').innerText = "SİTEYE FIRLAT!";
-            document.getElementById('cancel-btn').style.display = "none";
+            db.ref('mods').push(data).then(() => { alert("Başarıyla Fırlatıldı!"); location.reload(); });
         }
 
         db.ref('mods').on('value', (snap) => {
-            const listDiv = document.getElementById('game-list');
-            listDiv.innerHTML = "";
+            const list = document.getElementById('game-list');
+            list.innerHTML = "";
             snap.forEach((child) => {
-                const g = child.val(); const id = child.key;
-                listDiv.innerHTML += `
+                const g = child.val();
+                list.innerHTML += `
                     <div class="game-item">
-                        <span><strong>${g.name}</strong> (${g.category})</span>
-                        <div class="item-actions">
-                            <button class="edit-btn" onclick="editGame('${id}','${g.name}','${g.mod}','${g.link}','${g.img}','${g.category}')">DÜZENLE</button>
-                            <button class="delete-btn" onclick="if(confirm('Silinsin mi?')) db.ref('mods').child('${id}').remove()">SİL</button>
-                        </div>
+                        <span>${g.name}</span>
+                        <button class="del-btn" onclick="db.ref('mods').child('${child.key}').remove()">SİL</button>
                     </div>`;
             });
         });
