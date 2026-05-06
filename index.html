@@ -3,84 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEMAL MOD | Profesyonel APK Merkezi</title>
+    <title>KEMAL MOD | Profesyonel APK Platformu</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root { --bg: #0b1121; --card: #151f32; --primary: #3b82f6; --accent: #ffb700; --text: #f1f5f9; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         
-        #bakim-perdesi { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        
-        header { background: #151f32; padding: 20px; text-align: center; border-bottom: 3px solid var(--primary); position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 2.2rem; font-weight: 900; letter-spacing: 3px; color: var(--primary); margin: 0; text-transform: uppercase; }
+        header { background: #151f32; padding: 25px; text-align: center; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .logo { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: var(--primary); margin: 0; text-transform: uppercase; }
 
-        /* ARAMA VE KATEGORİ - GERİ GELDİ */
-        .search-container { padding: 30px 20px; max-width: 800px; margin: auto; text-align: center; }
+        /* ARAMA VE KATEGORİ */
+        .search-area { padding: 30px 20px; max-width: 900px; margin: auto; }
         .search-box { position: relative; margin-bottom: 20px; }
-        .search-box input { width: 100%; padding: 15px 50px; border-radius: 50px; border: 1px solid #2a3b5c; background: var(--card); color: white; font-size: 1.1rem; }
-        .search-box i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #64748b; }
+        .search-box input { width: 100%; padding: 18px 60px; border-radius: 50px; border: 1px solid #2a3b5c; background: var(--card); color: white; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .search-box i { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 1.3rem; }
 
-        .categories { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .cat-btn { background: var(--card); border: 1px solid #2a3b5c; color: #94a3b8; padding: 8px 18px; border-radius: 30px; cursor: pointer; transition: 0.3s; font-weight: 600; }
-        .cat-btn.active, .cat-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .categories { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+        .cat-btn { background: var(--card); border: 1px solid #2a3b5c; color: #94a3b8; padding: 10px 20px; border-radius: 30px; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* OYUN KARTLARI - YILDIZLAR EKLENDİ */
-        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; padding: 20px; max-width: 1200px; margin: auto; }
-        .card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid #2a3b5c; transition: 0.3s; position: relative; }
+        /* OYUN KARTLARI */
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; padding: 20px; max-width: 1250px; margin: auto; }
+        .card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid #2a3b5c; transition: 0.3s; }
         .card:hover { transform: translateY(-8px); border-color: var(--primary); }
-        .card-img { width: 100%; height: 180px; object-fit: cover; }
+        .card-img { width: 100%; height: 190px; object-fit: cover; }
+        
         .card-body { padding: 20px; }
-        .card-title { font-size: 1.3rem; font-weight: bold; margin: 0 0 10px 0; }
-        .meta-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px; }
-        .star-rating { color: var(--accent); font-weight: bold; }
-        .mod-text { color: #10b981; font-weight: 600; margin-bottom: 15px; font-size: 0.95rem; }
-        .btn-dl { display: block; background: var(--primary); color: white; text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: 800; transition: 0.3s; }
+        .card-title { font-size: 1.3rem; font-weight: 800; margin: 0 0 10px 0; color: white; }
+        
+        /* METALER: SÜRÜM VE YILDIZ */
+        .meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 10px; }
+        .version-tag { font-size: 0.85rem; color: #94a3b8; font-weight: bold; }
+        .star-box { color: var(--accent); font-weight: 900; font-size: 0.95rem; }
 
-        /* INSTAGRAM PANELİ - GERİ GELDİ */
-        .footer-insta { margin: 40px auto; max-width: 400px; padding: 20px; border: 2px solid var(--accent); border-radius: 20px; text-align: center; background: rgba(255,183,0,0.05); position: relative; overflow: hidden; }
-        .footer-insta::before { content: ""; position: absolute; inset: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1)); pointer-events: none; }
-        .insta-handle { font-size: 1.8rem; font-weight: 900; color: white; display: block; margin: 10px 0; text-decoration: none; }
-        .insta-tag { font-size: 0.7rem; letter-spacing: 3px; color: var(--accent); font-weight: bold; }
+        .mod-info { color: #10b981; font-weight: 600; font-size: 0.9rem; margin-bottom: 15px; }
+        .btn-download { display: block; background: var(--primary); color: white; text-align: center; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: 800; transition: 0.3s; }
 
-        footer { text-align: center; padding: 30px; color: #444; font-size: 0.8rem; }
+        /* INSTAGRAM PANELİ */
+        .insta-footer-box { margin: 50px auto; max-width: 400px; padding: 25px; border: 2px solid var(--accent); border-radius: 25px; text-align: center; background: rgba(255,183,0,0.05); }
+        .insta-tag { font-size: 0.7rem; letter-spacing: 3px; color: var(--accent); font-weight: 900; display: block; margin-bottom: 5px; }
+        .insta-link { font-size: 2rem; font-weight: 900; color: white; text-decoration: none; }
     </style>
 </head>
 <body>
 
-    <div id="bakim-perdesi">
-        <i class="fas fa-tools" style="font-size:4rem; color:var(--primary); margin-bottom:20px;"></i>
-        <h1>SİSTEM GÜNCELLENİYOR</h1>
-        <p>Kemal abi kontrolünde daha güçlü dönüyoruz!</p>
-    </div>
+    <header><h1 class="logo">KEMAL MOD</h1></header>
 
-    <div id="ana-site">
-        <header><h1 class="logo">KEMAL MOD</h1></header>
-
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Oyun ara Kemal abi..." onkeyup="search()">
-            </div>
-            <div class="categories">
-                <button class="cat-btn active" onclick="filter('Hepsi', this)">Tümü</button>
-                <button class="cat-btn" onclick="filter('Aksiyon', this)">Aksiyon</button>
-                <button class="cat-btn" onclick="filter('Spor', this)">Spor</button>
-                <button class="cat-btn" onclick="filter('Yarış', this)">Yarış</button>
-                <button class="cat-btn" onclick="filter('Simülasyon', this)">Simülasyon</button>
-            </div>
+    <section class="search-area">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Oyun ara Kemal abi..." onkeyup="searchGame()">
         </div>
-
-        <div class="container" id="gameGrid"></div>
-
-        <div class="footer-insta">
-            <span class="insta-tag">YAPIMCI INSTAGRAM</span>
-            <a href="https://instagram.com/Ke4m2l" target="_blank" class="insta-handle">@Ke4m2l</a>
-            <p style="color: #64748b; font-size: 0.8rem; margin: 0;">Tıkla ve Takip Et</p>
+        <div class="categories">
+            <button class="cat-btn active" onclick="filter('Hepsi', this)">Tümü</button>
+            <button class="cat-btn" onclick="filter('Aksiyon', this)">Aksiyon</button>
+            <button class="cat-btn" onclick="filter('Spor', this)">Spor</button>
+            <button class="cat-btn" onclick="filter('Yarış', this)">Yarış</button>
+            <button class="cat-btn" onclick="filter('Simülasyon', this)">Simülasyon</button>
         </div>
+    </section>
 
-        <footer>© 2026 Türkiye'nin En İyi Mod Platformu</footer>
+    <main class="container" id="gameGrid"></main>
+
+    <div class="insta-footer-box">
+        <span class="insta-tag">YAPIMCI INSTAGRAM</span>
+        <a href="https://instagram.com/Ke4m2l" target="_blank" class="insta-link">@Ke4m2l</a>
+        <br><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="30" style="margin-top:10px;">
     </div>
 
     <script>
@@ -88,43 +78,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Online Takibi
-        const onlineRef = db.ref('online').push();
-        onlineRef.set(true);
-        onlineRef.onDisconnect().remove();
-
-        // Bakım Kontrol
-        db.ref('bakimModu').on('value', s => {
-            document.getElementById('bakim-perdesi').style.display = s.val() ? "flex" : "none";
-            document.getElementById('ana-site').style.display = s.val() ? "none" : "block";
-        });
-
-        // Verileri Çek
         db.ref('mods').on('value', snap => {
             const grid = document.getElementById('gameGrid');
             grid.innerHTML = "";
             snap.forEach(child => {
                 const g = child.val();
+                // "undefined" hatasını engelleyen kontrol eklendi
+                const versionText = g.version ? g.version : 'v1.0'; 
+                
                 grid.innerHTML += `
-                <div class="card" data-cat="${g.category}">
+                <div class="card" data-category="${g.category}">
                     <img src="${g.img}" class="card-img">
                     <div class="card-body">
                         <h3 class="card-title">${g.name}</h3>
-                        <div class="meta-info">
-                            <span>Sürüm: ${g.version}</span>
-                            <span class="star-rating"><i class="fas fa-star"></i> 5.0</span>
+                        <div class="meta-row">
+                            <span class="version-tag">Sürüm: ${versionText}</span>
+                            <span class="star-box"><i class="fas fa-star"></i> 5.0</span>
                         </div>
-                        <p class="mod-text"><i class="fas fa-shield-check"></i> ${g.mod}</p>
-                        <a href="${g.link}" target="_blank" class="btn-dl">GÜVENLİ İNDİR</a>
+                        <p class="mod-info">${g.mod}</p>
+                        <a href="${g.link}" target="_blank" class="btn-download">GÜVENLİ İNDİR</a>
                     </div>
                 </div>`;
             });
         });
 
-        function search() {
-            let v = document.getElementById('searchInput').value.toLowerCase();
+        function searchGame() {
+            let val = document.getElementById('searchInput').value.toLowerCase();
             document.querySelectorAll('.card').forEach(c => {
-                c.style.display = c.querySelector('.card-title').innerText.toLowerCase().includes(v) ? "block" : "none";
+                c.style.display = c.querySelector('.card-title').innerText.toLowerCase().includes(val) ? "block" : "none";
             });
         }
 
@@ -132,7 +113,7 @@
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             document.querySelectorAll('.card').forEach(c => {
-                c.style.display = (cat === 'Hepsi' || c.getAttribute('data-cat') === cat) ? "block" : "none";
+                c.style.display = (cat === 'Hepsi' || c.getAttribute('data-category') === cat) ? "block" : "none";
             });
         }
     </script>
