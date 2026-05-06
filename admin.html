@@ -2,52 +2,50 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KEMAL MOD | FULL PANEL</title>
+    <title>KEMAL MOD | ADMIN PANEL V3</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         body { background: #070d19; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .panel { background: #121c2d; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #0066ff; margin-bottom: 30px; }
+        .panel { background: #121c2d; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #0066ff; margin-bottom: 20px; }
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: none; box-sizing: border-box; }
         input, select { background: #1e2a42; color: white; border: 1px solid #333; }
         button { background: #0066ff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #0044bb; }
-        
         .list-container { width: 100%; max-width: 450px; background: #121c2d; border-radius: 15px; padding: 20px; border: 1px solid #333; }
         .game-item { display: flex; flex-direction: column; padding: 15px; border-bottom: 1px solid #1e2a42; gap: 10px; }
-        .game-item:last-child { border-bottom: none; }
         .item-actions { display: flex; gap: 10px; }
-        .delete-btn { background: #ff3b3b; flex: 1; padding: 8px; font-size: 0.8rem; }
-        .edit-btn { background: #f39c12; flex: 1; padding: 8px; font-size: 0.8rem; }
-        
-        h2, h3 { text-align: center; color: #0066ff; }
-        #update-msg { color: #f39c12; text-align: center; font-weight: bold; display: none; }
+        .delete-btn { background: #ff3b3b; flex: 1; }
+        .edit-btn { background: #f39c12; flex: 1; }
+        #bakim-durum { text-align: center; font-size: 1.1rem; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
+    <div class="panel" style="border-color: #ff3b3b;">
+        <h3>Sistem Kontrolü</h3>
+        <div id="bakim-durum">Yükleniyor...</div>
+        <button id="bakim-btn" onclick="bakimDegistir()">DURUM DEĞİŞTİR</button>
+    </div>
+
     <div class="panel">
         <h2 id="panel-title">Oyun Ekle Kemal Abi</h2>
-        <p id="update-msg">Şu an bir oyunu güncelliyorsun!</p>
         <input type="text" id="n" placeholder="Oyun Adı">
-        <input type="text" id="m" placeholder="Mod Özelliği (Hile)">
+        <input type="text" id="m" placeholder="Mod Özelliği">
         <input type="text" id="l" placeholder="İndirme Linki">
-        <input type="text" id="i" placeholder="Resim Linki">
-        
+        <input type="text" id="i" placeholder="Resim Linki (.jpg, .png)">
         <select id="cat">
-            <option value="Diğer">Kategori Seç Abi</option>
+            <option value="Diğer">Kategori Seç</option>
             <option value="Spor">Spor</option>
             <option value="Aksiyon">Aksiyon</option>
             <option value="Yarış">Yarış</option>
             <option value="Simülasyon">Simülasyon</option>
         </select>
-
         <button id="main-btn" onclick="handleAction()">SİTEYE FIRLAT!</button>
-        <button id="cancel-btn" onclick="resetForm()" style="display:none; background:#555;">İPTAL ET</button>
+        <button id="cancel-btn" onclick="resetForm()" style="display:none; background:#555;">İPTAL</button>
     </div>
 
     <div class="list-container">
-        <h3>Aktif Oyunlar / Yönetim</h3>
+        <h3>Aktif Oyunlar</h3>
         <div id="game-list"></div>
     </div>
 
@@ -58,89 +56,77 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        let editingId = null;
 
-        let editingId = null; // Güncellenen oyunun ID'sini tutar
-
-        // EKLEME VEYA GÜNCELLEME KARARI
-        function handleAction() {
-            const name = document.getElementById('n').value;
-            const mod = document.getElementById('m').value;
-            const link = document.getElementById('l').value;
-            const img = document.getElementById('i').value;
-            const category = document.getElementById('cat').value;
-
-            if(!name || !link) return alert("Kemal abi, Ad ve Link lazım!");
-
-            const gameData = { name, mod, link, img, category };
-
-            if(editingId) {
-                // GÜNCELLEME
-                db.ref('mods').child(editingId).update(gameData).then(() => {
-                    alert("Oyun Bilgileri Güncellendi!");
-                    resetForm();
-                });
+        // BAKIM MODU FONKSİYONLARI
+        db.ref('bakimModu').on('value', (snap) => {
+            const durum = snap.val();
+            const p = document.getElementById('bakim-durum');
+            const btn = document.getElementById('bakim-btn');
+            if(durum) {
+                p.innerText = "Site Şu An: BAKIMDA 🛠️"; p.style.color = "#ff3b3b";
+                btn.innerText = "BAKIMDAN ÇIKAR"; btn.style.background = "#27ae60";
             } else {
-                // YENİ EKLEME
-                db.ref('mods').push(gameData).then(() => {
-                    alert("Yeni Oyun Fırlatıldı!");
-                    resetForm();
-                });
+                p.innerText = "Site Şu An: AÇIK ✅"; p.style.color = "#27ae60";
+                btn.innerText = "BAKIM MODUNU AÇ"; btn.style.background = "#ff3b3b";
+            }
+        });
+
+        function bakimDegistir() {
+            db.ref('bakimModu').once('value').then(s => db.ref('bakimModu').set(!s.val()));
+        }
+
+        // OYUN İŞLEMLERİ
+        function handleAction() {
+            const data = {
+                name: document.getElementById('n').value,
+                mod: document.getElementById('m').value,
+                link: document.getElementById('l').value,
+                img: document.getElementById('i').value,
+                category: document.getElementById('cat').value
+            };
+            if(!data.name || !data.link) return alert("Ad ve Link lazım abi!");
+            if(editingId) {
+                db.ref('mods').child(editingId).update(data).then(() => { alert("Güncellendi!"); resetForm(); });
+            } else {
+                db.ref('mods').push(data).then(() => { alert("Eklendi!"); resetForm(); });
             }
         }
 
-        // GÜNCELLEME MODUNA GEÇİŞ
         function editGame(id, n, m, l, i, c) {
             editingId = id;
-            document.getElementById('n').value = n;
-            document.getElementById('m').value = m;
-            document.getElementById('l').value = l;
-            document.getElementById('i').value = i;
+            document.getElementById('n').value = n; document.getElementById('m').value = m;
+            document.getElementById('l').value = l; document.getElementById('i').value = i;
             document.getElementById('cat').value = c;
-            
             document.getElementById('panel-title').innerText = "Oyunu Güncelle";
-            document.getElementById('main-btn').innerText = "DEĞİŞİKLİKLERİ KAYDET";
-            document.getElementById('main-btn').style.background = "#f39c12";
-            document.getElementById('update-msg').style.display = "block";
+            document.getElementById('main-btn').innerText = "KAYDET";
             document.getElementById('cancel-btn').style.display = "block";
             window.scrollTo(0,0);
         }
 
-        // FORMU SIFIRLA
         function resetForm() {
             editingId = null;
             document.querySelectorAll('input').forEach(i => i.value = "");
-            document.getElementById('cat').value = "Diğer";
             document.getElementById('panel-title').innerText = "Oyun Ekle Kemal Abi";
             document.getElementById('main-btn').innerText = "SİTEYE FIRLAT!";
-            document.getElementById('main-btn').style.background = "#0066ff";
-            document.getElementById('update-msg').style.display = "none";
             document.getElementById('cancel-btn').style.display = "none";
         }
 
-        // LİSTELEME
-        db.ref('mods').on('value', (snapshot) => {
+        db.ref('mods').on('value', (snap) => {
             const listDiv = document.getElementById('game-list');
             listDiv.innerHTML = "";
-            snapshot.forEach((child) => {
-                const g = child.val();
-                const id = child.key;
+            snap.forEach((child) => {
+                const g = child.val(); const id = child.key;
                 listDiv.innerHTML += `
                     <div class="game-item">
-                        <span><strong>${g.name}</strong> <small>(${g.category || 'Diğer'})</small></span>
+                        <span><strong>${g.name}</strong></span>
                         <div class="item-actions">
-                            <button class="edit-btn" onclick="editGame('${id}', '${g.name}', '${g.mod}', '${g.link}', '${g.img}', '${g.category}')">GÜNCELLE</button>
-                            <button class="delete-btn" onclick="removeGame('${id}')">SİL</button>
+                            <button class="edit-btn" onclick="editGame('${id}','${g.name}','${g.mod}','${g.link}','${g.img}','${g.category}')">DÜZENLE</button>
+                            <button class="delete-btn" onclick="if(confirm('Silinsin mi?')) db.ref('mods').child('${id}').remove()">SİL</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         });
-
-        function removeGame(id) {
-            if(confirm("Silmek istediğine emin misin abi?")) {
-                db.ref('mods').child(id).remove();
-            }
-        }
     </script>
 </body>
 </html>
